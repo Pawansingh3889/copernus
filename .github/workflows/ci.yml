@@ -8,10 +8,26 @@ on:
 jobs:
   gate:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: copernus
+          POSTGRES_PASSWORD: copernus
+          POSTGRES_DB: copernus
+        ports: ["5433:5432"]
+        options: >-
+          --health-cmd "pg_isready -U copernus"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0  # check_doc_freshness compares header dates to git log
       - uses: astral-sh/setup-uv@v4
       - run: uv sync
+      - run: uv run alembic upgrade head
       - run: make gate
+        env:
+          COP_TEST_PG_DSN: postgresql://copernus:copernus@localhost:5433/copernus
