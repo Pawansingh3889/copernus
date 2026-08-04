@@ -1,0 +1,23 @@
+# Environments & secrets
+.venv/
+.env
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.import_linter_cache/
+
+# Coverage
+.coverage
+coverage.json
+htmlcov/
+
+# Build
+dist/
+build/
+
+# Local data (demo DB volumes live in podman, not here)
+data/

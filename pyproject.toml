@@ -1,0 +1,154 @@
+[project]
+name = "copernus"
+version = "0.1.0"
+description = "Copernus — end the paperwork: QC capture, traceability, and factory intelligence"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn>=0.32",
+    "pydantic>=2.9",
+    "pydantic-settings>=2.5",
+    "sqlalchemy[asyncio]>=2.0",
+    "asyncpg>=0.30",
+    "alembic>=1.14",
+    "bcrypt>=4.2",
+    "jinja2>=3.1",
+    "python-multipart>=0.0.18",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "pytest-cov>=5.0",
+    "ruff>=0.7",
+    "mypy>=1.13",
+    "import-linter>=2.1",
+    "httpx>=0.27",
+    "aiosqlite>=0.20",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/copernus"]
+
+# ---------------------------------------------------------------------------
+# Architecture contracts (ARCHITECTURE.md §7)
+#
+# Every contract carries a `comment` explaining why it exists. A rule that
+# cannot explain itself gets deleted, not suppressed.
+# Ported from dora-factory @24803d9; widened for the auth/identity/audit
+# modules and the ui adapter layer.
+# ---------------------------------------------------------------------------
+[tool.importlinter]
+root_packages = ["copernus"]
+include_external_packages = true
+
+[[tool.importlinter.contracts]]
+name = "Modules are independent of each other"
+type = "independence"
+modules = [
+    "copernus.modules.auth",
+    "copernus.modules.identity",
+    "copernus.modules.audit",
+]
+comment = """
+ARCHITECTURE.md §7.1. No module may import a sibling; inter-module calls go
+through engine.dispatch(). The contract resolves the real import graph, so an
+aliased import, a re-export, or a chain through a third module all fail it.
+When a module is added, add it to this list — the contract is only as wide as
+the modules named in it.
+"""
+
+[[tool.importlinter.contracts]]
+name = "Layered architecture"
+type = "layers"
+layers = [
+    "copernus.api | copernus.ui",
+    "copernus.engine",
+    "copernus.modules",
+    "copernus.common",
+]
+containers = []
+comment = """
+Imports point downward only: (api|ui) -> engine -> modules -> common. The two
+adapters are peers on the top layer — both call the same services, neither
+imports the other. That peering is the two-adapter rule: HTMX today, a JSON
+consumer tomorrow, no rewrite in between.
+"""
+
+[[tool.importlinter.contracts]]
+name = "Services are pure — no I/O, no repository"
+type = "forbidden"
+source_modules = [
+    "copernus.modules.auth.service",
+    "copernus.modules.identity.service",
+    "copernus.modules.audit.service",
+]
+forbidden_modules = [
+    "copernus.modules.auth.repository",
+    "copernus.modules.identity.repository",
+    "copernus.modules.audit.repository",
+    "sqlalchemy",
+    "asyncpg",
+    "httpx",
+    "anthropic",
+    "socket",
+    "urllib",
+]
+comment = """
+ARCHITECTURE.md §7.2. service.py holds business logic as pure functions,
+testable with no database, no network, and no clock beyond what is passed in.
+Forbidding the sibling repository import is the load-bearing half: it is the
+convenient shortcut, and the one that would otherwise happen first. anthropic
+is on the list now so the rule is already true when the assistant module
+lands in Phase 8 — LLM calls are I/O and belong in repository.py.
+"""
+
+# ---------------------------------------------------------------------------
+# Per-module coverage floors, enforced by scripts/check_coverage_floors.py.
+# Not one global number: a global 80% lets a fully-tested pure core average
+# out an untested I/O layer. Services are pure and floor at 100.
+# ---------------------------------------------------------------------------
+[tool.copernus.coverage_floors]
+"src/copernus/engine.py" = 100
+"src/copernus/common/errors.py" = 100
+"src/copernus/common/types.py" = 95
+"src/copernus/common/logging.py" = 85
+"src/copernus/config.py" = 100
+"src/copernus/modules/auth/service.py" = 100
+"src/copernus/modules/auth/contract.py" = 100
+"src/copernus/modules/identity/service.py" = 100
+"src/copernus/modules/identity/contract.py" = 100
+"src/copernus/modules/audit/service.py" = 100
+"src/copernus/modules/audit/contract.py" = 100
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-q --strict-markers"
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.coverage.run]
+source = ["src/copernus"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests", "scripts"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+mypy_path = "src"
+packages = ["copernus"]
