@@ -1,0 +1,17 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # check_doc_freshness compares header dates to git log
+      - uses: astral-sh/setup-uv@v4
+      - run: uv sync
+      - run: make gate
