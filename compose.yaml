@@ -1,0 +1,20 @@
+services:
+  db:
+    image: docker.io/library/postgres:16-alpine
+    container_name: copernus-db
+    environment:
+      POSTGRES_USER: copernus
+      POSTGRES_PASSWORD: copernus
+      POSTGRES_DB: copernus
+    ports:
+      - "5433:5432"
+    volumes:
+      - copernus-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U copernus"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  copernus-pgdata:

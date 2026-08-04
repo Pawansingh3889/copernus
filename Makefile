@@ -32,7 +32,7 @@ migrate:
 	$(PY) alembic upgrade head
 
 serve:
-	$(PY) uvicorn copernus.api.app:create_app --factory --reload --port 8000
+	$(PY) uvicorn copernus.api.app:create_app --factory --reload --port 8010
 
 test:
 	$(PY) pytest
