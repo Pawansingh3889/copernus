@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Copernus{% endblock %}
+{% block content %}
+<h1>Copernus</h1>
+<p>Signed in as <strong>{{ user.email }}</strong> ({{ user.role.value }}).</p>
+<p>Capture screens arrive with Phase 4.</p>
+<form hx-post="/logout" hx-swap="none">
+  <button type="submit">Sign out</button>
+</form>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Sign in — Copernus{% endblock %}
+{% block content %}
+<h1>Copernus</h1>
+<form hx-post="/login" hx-target="#message" hx-swap="innerHTML">
+  <label for="email">Email</label>
+  <input id="email" name="email" type="email" autocomplete="username" required>
+  <label for="password">Password</label>
+  <input id="password" name="password" type="password" autocomplete="current-password" required>
+  <button type="submit">Sign in</button>
+</form>
+<div id="message">{% if error %}<p class="error">{{ error }}</p>{% endif %}</div>
+{% endblock %}

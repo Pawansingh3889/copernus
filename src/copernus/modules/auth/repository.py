@@ -50,16 +50,15 @@ async def create_user(
             id=user_id, email=email.lower(), password_hash=password_hash, person_id=person_id
         )
     )
-    return User(id=user_id, email=email.lower(), role=Role.PARTICIPANT, active=True,
-                person_id=person_id)
+    return User(
+        id=user_id, email=email.lower(), role=Role.PARTICIPANT, active=True, person_id=person_id
+    )
 
 
 async def get_by_email(session: AsyncSession, email: str) -> tuple[User, str] | None:
     """Returns the user and their password hash, or None."""
     row = (
-        await session.execute(
-            sa.select(user_account).where(user_account.c.email == email.lower())
-        )
+        await session.execute(sa.select(user_account).where(user_account.c.email == email.lower()))
     ).first()
     return (_user(row), row.password_hash) if row else None
 
@@ -81,9 +80,7 @@ async def create_session(
     )
 
 
-async def user_for_session(
-    session: AsyncSession, token_hash: str, now: datetime
-) -> User | None:
+async def user_for_session(session: AsyncSession, token_hash: str, now: datetime) -> User | None:
     row = (
         await session.execute(
             sa.select(user_account)
@@ -99,6 +96,4 @@ async def user_for_session(
 
 
 async def delete_session(session: AsyncSession, token_hash: str) -> None:
-    await session.execute(
-        sa.delete(session_token).where(session_token.c.token_hash == token_hash)
-    )
+    await session.execute(sa.delete(session_token).where(session_token.c.token_hash == token_hash))

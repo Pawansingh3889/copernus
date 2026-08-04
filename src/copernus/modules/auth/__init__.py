@@ -47,9 +47,7 @@ async def handle(event: Event, state: dict[str, Any]) -> Result[Any]:
             email = str(event.payload["email"]).strip().lower()
             found = await repository.get_by_email(session, email)
             # Same error either way — an attacker learns nothing about which half failed.
-            if not found or not service.verify_password(
-                str(event.payload["password"]), found[1]
-            ):
+            if not found or not service.verify_password(str(event.payload["password"]), found[1]):
                 return Result.err("Email or password is incorrect", "invalid_credentials")
             user, _ = found
             if not user.active:

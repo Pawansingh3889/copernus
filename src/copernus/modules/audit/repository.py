@@ -12,7 +12,10 @@ from copernus.modules.audit.contract import AuditEntry
 audit_log = sa.Table(
     "audit_log",
     metadata,
-    sa.Column("id", sa.BigInteger, sa.Identity(), primary_key=True),
+    # BigInteger on Postgres; plain Integer on SQLite, which only autoincrements that.
+    sa.Column(
+        "id", sa.BigInteger().with_variant(sa.Integer, "sqlite"), sa.Identity(), primary_key=True
+    ),
     sa.Column("event", sa.Text, nullable=False),
     sa.Column("user_id", sa.Text),
     sa.Column("correlation_id", sa.Text),
@@ -29,9 +32,7 @@ async def append(session: AsyncSession, entry: AuditEntry) -> None:
 
 
 async def recent(session: AsyncSession, limit: int = 50) -> list[AuditEntry]:
-    rows = await session.execute(
-        sa.select(audit_log).order_by(audit_log.c.id.desc()).limit(limit)
-    )
+    rows = await session.execute(sa.select(audit_log).order_by(audit_log.c.id.desc()).limit(limit))
     return [
         AuditEntry(
             event=r.event,

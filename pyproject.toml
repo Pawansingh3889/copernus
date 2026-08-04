@@ -67,6 +67,7 @@ the modules named in it.
 name = "Layered architecture"
 type = "layers"
 layers = [
+    "copernus.app",
     "copernus.api | copernus.ui",
     "copernus.engine",
     "copernus.modules",
@@ -74,7 +75,7 @@ layers = [
 ]
 containers = []
 comment = """
-Imports point downward only: (api|ui) -> engine -> modules -> common. The two
+Imports point downward only: app -> (api|ui) -> engine -> modules -> common. The two
 adapters are peers on the top layer — both call the same services, neither
 imports the other. That peering is the two-adapter rule: HTMX today, a JSON
 consumer tomorrow, no rewrite in between.
@@ -94,6 +95,7 @@ forbidden_modules = [
     "copernus.modules.audit.repository",
     "sqlalchemy",
     "asyncpg",
+    "sqlite3",
     "httpx",
     "anthropic",
     "socket",

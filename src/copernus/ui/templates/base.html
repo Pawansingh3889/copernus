@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Copernus{% endblock %}</title>
+  <script src="/static/htmx.min.js"></script>
+  <style>
+    /* Shop-floor defaults: dense, high contrast, big touch targets. */
+    :root { --ink: #111; --paper: #fafafa; --accent: #0a5; --error: #b00020; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 16px/1.45 system-ui, sans-serif; color: var(--ink);
+           background: var(--paper); }
+    main { max-width: 28rem; margin: 8vh auto; padding: 0 1rem; }
+    h1 { font-size: 1.4rem; }
+    label { display: block; margin-top: 1rem; font-weight: 600; }
+    input { width: 100%; padding: .8rem; margin-top: .3rem; font-size: 1rem;
+            border: 2px solid #999; border-radius: 4px; }
+    button { margin-top: 1.2rem; padding: .9rem 1.4rem; font-size: 1.05rem;
+             font-weight: 700; color: #fff; background: var(--accent);
+             border: 0; border-radius: 4px; cursor: pointer; }
+    .error { color: var(--error); font-weight: 600; margin-top: .8rem; }
+  </style>
+</head>
+<body>
+  <main>{% block content %}{% endblock %}</main>
+</body>
+</html>
