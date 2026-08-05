@@ -32,7 +32,7 @@ async def handle(event: Event, state: dict[str, Any]) -> Result[Any]:
 
         if event.type == "identity.resolve":
             person_id = UUID(str(event.payload["person_id"]))
-            record = await repository.resolve(session, person_id)
-            return Result.success(service.display_name(person_id, record))
+            resolved = await repository.resolve(session, person_id)
+            return Result.success(service.display_name(person_id, resolved))
 
     return Result.err(f"identity does not handle {event.type!r}", "module_not_found")

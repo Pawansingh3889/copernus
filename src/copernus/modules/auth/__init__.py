@@ -69,10 +69,10 @@ async def handle(event: Event, state: dict[str, Any]) -> Result[Any]:
             return Result.success(True)
 
         if event.type == "auth.whoami":
-            user = await repository.user_for_session(
+            current = await repository.user_for_session(
                 session, service.hash_token(str(event.payload["token"])), now
             )
-            return Result.success(user)  # None means "not logged in", not an error
+            return Result.success(current)  # None means "not logged in", not an error
 
         if event.type == "auth.promote":
             ok = await repository.set_role(

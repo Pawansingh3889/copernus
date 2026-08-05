@@ -9,6 +9,7 @@ JSON; sets the same cookie. Validation lives once, in the service.
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
 from fastapi import APIRouter, Form, Request, Response
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -22,7 +23,7 @@ templates = Jinja2Templates(directory=str(Path(__file__).parent.parent / "templa
 COOKIE = "copernus_session"
 
 
-async def _current_user(request: Request):
+async def _current_user(request: Request) -> Any:
     token = request.cookies.get(COOKIE)
     if not token:
         return None
@@ -33,7 +34,7 @@ async def _current_user(request: Request):
 
 
 @router.get("/", response_class=HTMLResponse)
-async def index(request: Request):
+async def index(request: Request) -> Response:
     user = await _current_user(request)
     if user is None:
         return RedirectResponse("/login", status_code=303)
@@ -41,12 +42,12 @@ async def index(request: Request):
 
 
 @router.get("/login", response_class=HTMLResponse)
-async def login_page(request: Request):
+async def login_page(request: Request) -> Response:
     return templates.TemplateResponse(request, "login.html", {})
 
 
 @router.post("/login")
-async def login(request: Request, email: str = Form(), password: str = Form()):
+async def login(request: Request, email: str = Form(), password: str = Form()) -> Response:
     result = await request.app.state.engine.dispatch(
         Event(type="auth.login", payload={"email": email, "password": password})
     )
@@ -67,7 +68,7 @@ async def login(request: Request, email: str = Form(), password: str = Form()):
 
 
 @router.post("/logout")
-async def logout(request: Request):
+async def logout(request: Request) -> Response:
     token = request.cookies.get(COOKIE)
     if token:
         await request.app.state.engine.dispatch(Event(type="auth.logout", payload={"token": token}))

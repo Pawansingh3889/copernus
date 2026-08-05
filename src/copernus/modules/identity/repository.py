@@ -64,4 +64,6 @@ async def erase(session: AsyncSession, person_id: UUID) -> bool:
     result = await session.execute(
         sa.delete(person_identity).where(person_identity.c.person_id == person_id)
     )
+    # DML statements always come back as a CursorResult, which carries rowcount.
+    assert isinstance(result, sa.CursorResult)
     return bool(result.rowcount)

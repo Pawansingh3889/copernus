@@ -4,6 +4,8 @@ two thin skins over one service, never two services (the two-adapter rule)."""
 
 from __future__ import annotations
 
+from typing import Any
+
 from fastapi import APIRouter, Request, Response
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
@@ -26,7 +28,7 @@ _STATUS_BY_CODE = {
 COOKIE = "copernus_session"
 
 
-def error_response(result: Result) -> JSONResponse:
+def error_response(result: Result[Any]) -> JSONResponse:
     status = _STATUS_BY_CODE.get(result.error_code or "", 400)
     return JSONResponse(
         status_code=status, content={"error": result.error, "code": result.error_code}
@@ -44,8 +46,8 @@ class LoginBody(BaseModel):
     password: str
 
 
-@router.post("/auth/register", status_code=201)
-async def register(body: RegisterBody, request: Request):
+@router.post("/auth/register", status_code=201, response_model=None)
+async def register(body: RegisterBody, request: Request) -> JSONResponse | dict[str, Any]:
     result = await request.app.state.engine.dispatch(
         Event(type="auth.register", payload=body.model_dump())
     )
@@ -55,8 +57,10 @@ async def register(body: RegisterBody, request: Request):
     return {"id": str(user.id), "email": user.email, "role": user.role.value}
 
 
-@router.post("/auth/login")
-async def login(body: LoginBody, request: Request, response: Response):
+@router.post("/auth/login", response_model=None)
+async def login(
+    body: LoginBody, request: Request, response: Response
+) -> JSONResponse | dict[str, Any]:
     result = await request.app.state.engine.dispatch(
         Event(type="auth.login", payload=body.model_dump())
     )
@@ -76,7 +80,7 @@ async def login(body: LoginBody, request: Request, response: Response):
 
 
 @router.post("/auth/logout")
-async def logout(request: Request, response: Response):
+async def logout(request: Request, response: Response) -> dict[str, bool]:
     token = request.cookies.get(COOKIE)
     if token:
         await request.app.state.engine.dispatch(Event(type="auth.logout", payload={"token": token}))
@@ -84,8 +88,8 @@ async def logout(request: Request, response: Response):
     return {"ok": True}
 
 
-@router.get("/auth/me")
-async def me(request: Request):
+@router.get("/auth/me", response_model=None)
+async def me(request: Request) -> JSONResponse | dict[str, Any]:
     token = request.cookies.get(COOKIE)
     if not token:
         return JSONResponse(status_code=401, content={"error": "Not logged in"})

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Any
 from uuid import UUID, uuid4
 
 import sqlalchemy as sa
@@ -36,7 +37,7 @@ session_token = sa.Table(
 )
 
 
-def _user(row: sa.Row) -> User:
+def _user(row: sa.Row[Any]) -> User:
     return User(
         id=row.id, email=row.email, role=Role(row.role), active=row.active, person_id=row.person_id
     )
@@ -68,6 +69,8 @@ async def set_role(session: AsyncSession, user_id: UUID, role: Role) -> bool:
     result = await session.execute(
         sa.update(user_account).where(user_account.c.id == user_id).values(role=role.value)
     )
+    # DML statements always come back as a CursorResult, which carries rowcount.
+    assert isinstance(result, sa.CursorResult)
     return bool(result.rowcount)
 
 

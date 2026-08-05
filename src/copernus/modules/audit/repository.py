@@ -4,6 +4,9 @@ trigger that raises on both — C-03 is enforced by the database, not convention
 
 from __future__ import annotations
 
+from collections.abc import Awaitable, Callable
+from typing import Any
+
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
@@ -45,7 +48,9 @@ async def recent(session: AsyncSession, limit: int = 50) -> list[AuditEntry]:
     ]
 
 
-def make_sink(factory: async_sessionmaker):
+def make_sink(
+    factory: async_sessionmaker[AsyncSession],
+) -> Callable[[dict[str, Any]], Awaitable[None]]:
     """The engine's audit_sink: persists every dispatch in its own transaction.
 
     Separate from the handler's transaction on purpose — a rolled-back request
@@ -53,7 +58,7 @@ def make_sink(factory: async_sessionmaker):
     """
     from copernus.modules.audit.service import entry_from_dispatch
 
-    async def sink(raw: dict) -> None:
+    async def sink(raw: dict[str, Any]) -> None:
         async with factory() as session, session.begin():
             await append(session, entry_from_dispatch(raw))
 
