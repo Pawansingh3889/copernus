@@ -141,29 +141,37 @@ indistinguishable.
   date somebody is despatching against.
 - **An extended use-by must carry its provenance.** A date a rule produced and a date a human chose
   have to be distinguishable in the model, or nobody can answer "why does this batch have twelve
-  days" under audit.
+  days" under audit. Observed: the concession today is a **paper form** filed with the run
+  paperwork — the decision, its signer and its date exist in no queryable form, so provenance (and
+  the trending below) starts from zero.
 - **Concession rate is a quality metric worth trending.** A rising rate means material is arriving
   older or moving slower, and it is visible in the data long before it is visible in a complaint.
 
 ### Observed
 
 An intake label on a crate of Scottish salmon carries a letter-prefixed alphanumeric lot code, a
-supply date and a use-by date **exactly eighteen days apart**. That is the constant above, seen in
+harvest date and a use-by date **exactly eighteen days apart**. That is the constant above, seen in
 the wild — and it is also §1's intake namespace in use, since the code is alphanumeric rather than
 the six-digit run number a finished case carries.
 
-It is a *supply* date on the label, not a stated harvest date. Whether those are the same field is
-C3 below, and it is the question with the most downstream consequence in this section.
+The first date is the **harvest/kill date** (confirmed): use-by = harvest + 18, so days-from-harvest
+is computable. That answers C3. Also confirmed: superchilling is decided **per customer order** and
+applied on site — an order attribute, not a product property (bears on C1/C2's classing).
 
-**Open — none of this is implementable without these answers:**
+A second observed intake tag — fresh Norwegian salmon this time, lot `F6160B` — carries 11.06.26
+and 29.06.26: the same eighteen days, to the day, across a different supplier and origin. Two
+origins on otherwise identical tags is also §6's region-of-capture row seen from the intake side:
+region travels with the batch.
 
-| # | Question | Why it cannot be assumed |
+**All answered (2026-08-04):**
+
+| # | Answer | Consequence |
 |---|---|---|
-| C1 | On a fixed 18-day total, what makes one batch 9–10 days at packing and another 11–12? That difference is time in process — a property of the *batch* — yet §4 calls the class a property of the *product*. Both cannot be true | If it is process time, then `DFI_EXTENDED_SHELF_LIFE_DAYS` and the `STANDARD`/`EXTENDED` classes in `contract.py` model a symptom as though it were a product attribute, and rule 1's third tie-break is sorting on the wrong thing |
-| C2 | Does superchilled salmon have a total other than 18? | The only other way both figures can hold. Resolves C1 in the opposite direction, and leaves the class model intact |
-| C3 | Is the 18 days counted from **harvest**, or from intake/supply as the observed label suggests? | If the anchor is intake, and intake lags harvest by wellboat transit, then every use-by is optimistic by that lag and days-from-harvest cannot be computed at all. A customer clause written in days-from-harvest would be unenforceable against this data |
-| C4 | Does a concession extend shelf life *up to* 9 days, or *beyond* it? | Decides whether a conceded batch can outrank an unconceded one in the ordering |
-| C5 | Is `DFI_HARVEST_WINDOW_DAYS = 9` the floor on life remaining at packing, rather than a maximum material age as its name says? | If so it is misnamed, and it is the pack-by rule above wearing the wrong label. Two rules on one knob is the failure the last section of this document exists to prevent |
+| C1 | **Superchilling separates the classes** — a per-customer-order process decision, not a product attribute | `STANDARD`/`EXTENDED` must live on the *order*, not the product; build it that way here |
+| C2 | **No — the total stays 18** for superchilled and standard alike | No second total to model |
+| C3 | **Anchored on the harvest/kill date** | Days-from-harvest is computable; customer clauses written in it are enforceable |
+| C4 | **Concession is capped at pack date + 10**; superchilled packing itself needs none | A conceded batch cannot outrank a superchilled one |
+| C5 | **Minimum life remaining at packing** — the pack-by floor, not a maximum material age | The `DFI_HARVEST_WINDOW_DAYS` name (dora-factory) is wrong; name it as the floor when it is ported |
 
 The window length is configuration. It differs by product and it changes.
 
@@ -172,22 +180,60 @@ The window length is configuration. It differs by product and it changes.
 The per-run quality control document carries data that exists in no queryable form. It is the second
 half of this project's scope: not new analysis, but ending the transcription.
 
+The boundary of that claim matters: **units and weights already live in SI**, the site's factory
+system — baskets in, cases out, every transaction carrying a count and a weight in kg. The paper
+record even cross-checks itself against it ("does SI match the product basket count?"). What exists
+in no queryable form is the rest of this section: the checks themselves.
+
 | Check | Cadence | Notes |
 |---|---|---|
-| Metal detection | Hourly | Three sensitivity thresholds — ferrous, stainless, non-ferrous — each a different aperture size in mm. Stainless is the least sensitive and therefore the binding constraint |
-| Product temperature | Hourly | A single upper limit, low single-digit °C. Excursions are the metric, not averages — an average is guaranteed to hide the excursion that matters |
-| Label verification | Per run | Confirms the printed label matches the intended product, including certification claims |
-| Clean-down times | Per changeover | Start and end. Allergen changeover integrity depends on these |
+| Metal detection | Hourly | Three sensitivity thresholds — ferrous, stainless, non-ferrous — each a different aperture size in mm. Stainless is the least sensitive and therefore the binding constraint (observed: Fe 2.5, SS 4.0, NF 3.0). A failed test reports to Engineers & QA, and everything since the last good test goes on hold for re-checks |
+| Product temperature | Hourly | A single upper limit, low single-digit °C (observed target: < 4 °C, QA notified above it). Excursions are the metric, not averages — an average is guaranteed to hide the excursion that matters |
+| Label verification | Start of run, every reel change, end of run | Confirms the printed label matches the intended product, including certification claims. The control unit is the **reel** (label roll), not the individual label — see below |
+| Clean-down times | Per changeover | Start and end, inspected and released by a team leader. Allergen changeover integrity depends on these |
 | Allergen declaration | Per run | Drives changeover requirements |
-| Region of capture | Per run | Regulatory requirement on the finished pack |
+| Region of capture | Per batch code | Regulatory requirement on the finished pack. Arrives on the supplier's trace tag, keyed in at goods-in; the retail traceability sheet lists it per batch code, and the run paperwork is filled from that sheet — model it on the batch, let runs inherit it |
 
 **Everything here is hand-written and then hand-copied.** Each transcription is an opportunity to
 introduce an error into the one record that would be produced under regulatory challenge.
 
+### Label control is reel reconciliation
+
+Labels arrive on rolls of 1,500 or 2,000 — the paperwork calls them **reels**. A reel is **issued**
+to a run and **returned** at the end of it, and both movements are recorded by count *and* by
+weight — weight is the practical cross-check, because nobody hand-counts the labels remaining on a
+part-used reel. The issue and return movements are recorded in **SI** — reels are stock items like
+film and boards — so the reconciliation's inputs are already digital; what exists only on paper is
+the verification events. Every pack passes through sealing and then labelling from the reel on the
+machine, so verifying the reel once verifies every pack behind it.
+
+The packing record verifies the reel at three moments — first-reel check at start of run, a check at
+**every reel change**, and an end-of-run label check. Each check carries the operative, the time,
+the reel batch number, and a machine vision verification (Dimaco) recorded as PASS/FAIL with its job
+number; a sample label from each reel is physically attached to the record. The fields checked
+against the approved specification: allergen declaration, barcode, site approval number,
+GGN / MSC / ASC certification number, and region of capture.
+
+The reconciliation is the actual control: issued minus returned is the number of labels used, and
+that figure is reconciled against **all packs labelled — accepted, reworked and wasted alike — plus
+any damaged labels**. The checkweigher's accepted count is not the denominator: a pack that was
+reworked or wasted still consumed a label. A gap is a label whose destination is unknown — and an
+unaccounted-for label is exactly how a wrong allergen declaration or certification claim ends up on
+a pack, which is what the checks above exist to prevent.
+
+For the model this means the reel, not the printed label, is the natural entity: an issue record and
+a return record, each carrying count and weight, plus the verification events — start, each change,
+end — bracketing the run they served.
+
+The **case barcode is a different artifact** and must not be conflated with the pack label: finished
+product goes into baskets or boxes whose barcode labels OCM generates, and the packing record
+attaches and checks those case labels in their own section.
+
 ## 7. The end-of-run checkweigher summary
 
 At the end of every run, the checkweigher displays a summary. It is **read off the screen and copied
-onto the paper form by hand.** The fields:
+onto the paper form by hand** — even though the same numbers land in the SI database. The hand-copy
+runs in parallel with data that is already digital. The fields:
 
 | Field | Why it matters |
 |---|---|
@@ -195,15 +241,30 @@ onto the paper form by hand.** The fields:
 | Packs reworked | Recoverable loss |
 | Packs wasted | Unrecoverable loss |
 | Mean weight | Against target, this is the giveaway measure |
-| Tolerance band percentages | Weight distribution — the shape of the giveaway, not just its size |
+| Tolerance band percentages | Weight distribution — the shape of the giveaway, not just its size. On the form this is "T1–T2 %", against the T1/T2 settings declared in the run header |
 
 Giveaway is the gap between mean weight and target weight, multiplied across every pack. It is
 individually trivial and collectively expensive, and it is currently invisible between runs because
 nobody is going to trend a number that lives on a clipboard.
 
-**Capturing this is the single highest-value transcription to eliminate**: it is a fixed, small,
-well-defined set of numbers, produced at a predictable moment, currently copied by hand into a form
-that is then filed rather than analysed.
+**This is the single highest-value transcription to eliminate, and it is a read, not a build**: a
+fixed, small, well-defined set of numbers, produced at a predictable moment, already sitting in the
+SI database (the `SI_DTI_ARCHIVE_Weigher` tables are the candidates) — currently copied by hand into
+a form that is then filed rather than analysed. Locate the table, confirm it populated, and the
+transcription is over.
+
+---
+
+## 8. Product tiers and the allocation ladder
+
+**Value tiers off the chopper.** Cut highest-value-first; the switch point is manual. Cod: loins
+(260 g, belly) → fillets (250 g, sides) → simply (2–10 pieces, tail/trim), cutter switched once
+the loins target is met. Salmon: 140 g → 120 g → 110 g → simply. Nothing records whether a
+different switch point would pay better, or which supplier's fish cuts more loins.
+
+**The certification ladder.** RSPCA Assured sits above GlobalG.A.P. / standard, asymmetrically:
+premium material may fill a standard order — a silent, untracked margin loss — but standard
+material may never fill a certified claim. A downgrade is a cost; an upgrade is a breach.
 
 ---
 

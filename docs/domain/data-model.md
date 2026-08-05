@@ -13,10 +13,12 @@ are standing.
 | Stage | Shape | Example shape | What it identifies |
 |---|---|---|---|
 | Raw material intake | Alphanumeric, letter-prefixed, short | `A1234B` | A supplier consignment / lot |
-| Finished case label | All-numeric, six digits | `123456` | A **production run**, not a lot |
+| Finished case label | All-numeric, six digits, zero-padded | `035366` | A **production run**, not a lot |
 
 The finished-goods label does not carry the raw-material lot code at all — it carries the run
-number. So this join:
+number. Finished product goes into baskets or boxes, and **OCM — the same system that mints the run
+number — generates the barcode label applied to each one**; that is how the run number gets onto
+the case, and SI scans it from there onward. So this join:
 
 ```sql
 -- WRONG. Silently returns almost nothing, or worse, coincidental matches.
@@ -27,8 +29,12 @@ FROM raw_material rm JOIN finished_goods fg ON rm.batch_code = fg.batch_code
 namespaces that happen to share a column name. It will not error. It will return a small,
 plausible, wrong result set — the worst failure mode available.
 
-**Model them as distinct, differently-named, differently-typed columns**: `material_lot_code`
-(string) and `run_number` (integer). Never reconstruct one from the other by string matching. The
+**Model them as distinct, differently-named columns**: `material_lot_code` and `run_number`. A trap
+inside the trap: run numbers are **zero-padded** — `035366` is what screens and labels carry, and
+the source system stores the column as a string, so the leading zero is significant in any match
+against a label. Keep `run_number` a fixed-width six-digit string that must *parse* as an integer
+(or store an integer and zero-pad every render); never let `35366` and `035366` become two
+different runs. Never reconstruct one column from the other by string matching. The
 relationship between them is a real relationship in the data — it is the genealogy edge list in §4
 — and it must be traversed, not guessed.
 
@@ -47,6 +53,10 @@ grouping that uses a bare `|`:
 ```
 A1234B|s|A1234E|A1235B
 ```
+
+The mixing is not random: OCM **scan-back** returns re-enter production next day in tier-3 runs —
+marinade, simply (business-rules §8) — so composites concentrate in the lowest-value products.
+The true lot is still resolvable, but only via the split below.
 
 Consequences:
 
@@ -76,6 +86,15 @@ The same product's certification status is stated in three independent places:
 | Product description text | Certification named inline in a free-text description | Human-entered; the least reliable, the most readable |
 | A dedicated branding/certification field | A scheme code, sometimes with a chain-of-custody number appended | This is the string printed on the pack |
 | The paper quality-control document for the run | An approval box completed per run | Authoritative for the run, but on paper — not queryable today |
+
+The schemes in play are three: **GlobalG.A.P.** (a GGN / chain-of-custody number, farmed salmon),
+**RSPCA Assured** (welfare, also farmed salmon), and **MSC** (a certificate registration code,
+wild-caught cod, haddock and hake) — observed in the branding field as `GGap-CoC 4059883971576`,
+`RSPCA-A`, and `MSC-C-50147`. GlobalG.A.P. and RSPCA salmon run as separate material streams (run
+descriptions distinguish `GG SALMON` from `RSPCA SALMON`), so a certification claim is also a
+**segregation constraint on raw material**, not just a printed string. The constraint is asymmetric
+(business-rules §8): premium material may fill a standard order — a costed downgrade worth
+detecting — but standard material may never fill a certified claim.
 
 They are not guaranteed to agree, and the interesting cases are exactly the disagreements: a run
 whose input material is certified but whose output is not is a real, costly event, and it is
@@ -108,6 +127,18 @@ material_lot ──► run_number ──► customer despatch
                      │
                      └──► onward run (trimming, rework)
 ```
+
+**Two levels of identifier, but many runs deep.** Each department opens its own run — tempering /
+defrost, filleting / portioning, curing / smoking where the product has it, then retail packing
+opens new runs again — and each accounts its own yield per run. A lot's path to despatch is
+therefore normally a *chain* of runs, and the edge between two runs is made physically by container
+scans: OCM prints a barcode per basket or box, with its tare weight held in OCM; filling it books
+the net weight into the producing run's **output**, and scanning it at the next line books it into
+the consuming run's **input** (observed: 36 packs to a basket, 2.25 kg tare, 16 baskets to a
+pallet — and a wrong tare assumption once biased yield by 14 kg per pallet, so tares are
+configuration worth guarding). An edge is a pair of scans, and it carries a weight on both sides —
+which is exactly what §5's mass balance needs (D3 still requires confirming this in the tables, and
+where WIP sits between the two scans).
 
 **Traversal is directed and two-phase, not an undirected flood.** Both directions do *not* fall out
 of one query:
@@ -142,7 +173,10 @@ SELECT DISTINCT node FROM up WHERE depth > 0;
 Two cautions:
 
 - **Cycles.** Rework and reprocessing can produce a run that appears both upstream and downstream of
-  another. A recursive CTE without a visited-set will not terminate. Track visited nodes and cap
+  another. Observed practice cuts both ways: same-shift rework re-enters the **same run** — no edge
+  at all, just material crossing the line twice inside one run's balance — while held-over rework
+  opens its own later run (OCM run descriptions like `…280G (REWORK)` exist). So an edge-level cycle
+  is rare but real. A recursive CTE without a visited-set will not terminate. Track visited nodes and cap
   depth; a query that hangs during a recall is worse than one that returns a bounded partial answer
   with a warning.
 - **Edges are observations, not truths.** An edge asserts what the ERP recorded, which is not
@@ -199,8 +233,8 @@ each with a different plan:
   and the trace shows `GRN` instead of a name.
 - Sparsely populated → the field is unreliable and must never be presented as authoritative.
 
-Do not promise inline supplier attribution in any demo until this is settled. It is the first claim
-a quality manager will test.
+**Answered (2026-08-04): sparse and unreliable.** Supplier is never presented as authoritative; a
+trace shows `GRN` where present, nothing more.
 
 ---
 
@@ -240,7 +274,7 @@ Everything above collapses into five ingest-time rules:
 
 | # | Question | Blocks |
 |---|---|---|
-| D1 | Is `GRN` populated, and does it resolve to a supplier? (§6) | Supplier attribution in any trace |
+| D1 | ~~Is `GRN` populated, and does it resolve to a supplier?~~ **Answered: sparse/unreliable — never authoritative** (§6) | Supplier attribution in any trace |
 | D2 | Which `SI_OCM_*` tables hold transfer and return history? (§7) | Transfer/return audit |
 | D3 | Do quantities exist on both sides of every edge, and where is WIP held? (§5) | Mass balance |
 
