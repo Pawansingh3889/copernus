@@ -18,7 +18,7 @@ make serve          # http://localhost:8010  (JSON API under /api/v1, docs at /d
 
 ```bash
 make test           # 65 tests, SQLite in-memory — no daemon needed
-make gate           # lint, import contracts, guards, coverage floors, gate proofs
+make gate           # lint, types, import contracts, guards, coverage floors, gate proofs
 ```
 
 ## What this is

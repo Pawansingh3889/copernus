@@ -67,7 +67,7 @@ coverage-floors:
 gate-proof:
 	$(PY) pytest tests/test_gates.py -v
 
-gate: lint imports guards coverage-floors gate-proof
+gate: lint typecheck imports guards coverage-floors gate-proof
 	@echo ""
 	@echo "All gates passed, and each was proven to fail on a planted violation."
 

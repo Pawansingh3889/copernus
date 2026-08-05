@@ -7,6 +7,13 @@ versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- All 18 strict-mypy errors: DML results narrowed to `CursorResult` before reading
+  `rowcount`; `User | None` / `IdentityRecord | None` no longer assigned to
+  non-optional variables; return annotations on every route handler; generic
+  arguments on `Row`, `Result`, `async_sessionmaker` and the audit sink.
+
 ### Added
 
 - Domain docs: label control documented as reel reconciliation — reels of 1,500 or
@@ -17,6 +24,9 @@ versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- `make gate` now includes `typecheck` (strict mypy), so CI enforces it on every
+  push; `tests/test_gates.py` proves it rejects a planted type error from a cold
+  cache.
 - `docs/domain/business-rules.md`: quality-check facts verified against shop-floor
   records and SI screens — observed metal-detection apertures (Fe 2.5 / SS 4.0 /
   NF 3.0 mm), the < 4 °C temperature target, region of capture per batch code (from

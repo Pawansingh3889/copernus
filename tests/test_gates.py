@@ -32,6 +32,7 @@ SCRIPTS = REPO_ROOT / "scripts"
 # __main__, so `-m` exits 0 having done nothing. A proof that invokes the
 # checker wrongly is the exact failure these tests exist to catch.
 LINT_IMPORTS = Path(sys.executable).parent / "lint-imports"
+MYPY = Path(sys.executable).parent / "mypy"
 
 
 def run_guard(script: str, root: Path, *extra: str) -> subprocess.CompletedProcess[str]:
@@ -356,6 +357,60 @@ def test_forbidden_contract_rejects_io_in_a_service(tmp_path):
     assert result.returncode == 1, result.stdout + result.stderr
     assert "BROKEN" in result.stdout
     assert "Services are pure" in result.stdout
+
+
+# --------------------------------------------------------------------------
+# mypy — strict typing
+# --------------------------------------------------------------------------
+
+
+def test_typecheck_holds_on_the_real_repo():
+    """Strict mypy passes as the repository actually stands."""
+    result = subprocess.run(
+        [str(MYPY)],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "no issues found" in result.stdout
+
+
+def test_typecheck_rejects_a_planted_type_error(tmp_path):
+    """Plant one wrong assignment and prove strict mypy fails the gate.
+
+    Run against a copy so the real tree is never modified. `.mypy_cache` is
+    excluded from the copy on purpose: the proof must hold from a cold start,
+    not because a cache happened to agree.
+    """
+    import shutil
+
+    work = tmp_path / "repo"
+    shutil.copytree(
+        REPO_ROOT,
+        work,
+        ignore=shutil.ignore_patterns(
+            ".git", ".venv", "__pycache__", ".pytest_cache", ".ruff_cache", ".mypy_cache", "htmlcov"
+        ),
+    )
+
+    config = work / "src" / "copernus" / "config.py"
+    config.write_text(
+        config.read_text(encoding="utf-8") + '\nbroken: int = "not an int"\n', encoding="utf-8"
+    )
+
+    result = subprocess.run(
+        [str(MYPY)],
+        cwd=work,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "Incompatible types in assignment" in result.stdout
 
 
 # --------------------------------------------------------------------------
