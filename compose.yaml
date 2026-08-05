@@ -6,8 +6,6 @@ services:
       POSTGRES_USER: copernus
       POSTGRES_PASSWORD: copernus
       POSTGRES_DB: copernus
-    ports:
-      - "5433:5432"
     volumes:
       - copernus-pgdata:/var/lib/postgresql/data
     healthcheck:
