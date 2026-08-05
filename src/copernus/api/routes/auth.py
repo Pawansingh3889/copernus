@@ -1,3 +1,4 @@
+# This file is the machine door for logging in and out. The auth module does the real work.
 """JSON adapter for auth. The HTML adapter in ui/ calls the same handlers —
 two thin skins over one service, never two services (the two-adapter rule)."""
 

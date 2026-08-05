@@ -1,3 +1,4 @@
+# This file holds the rules about people. It never touches the database.
 """Identity rules. Pure functions — no I/O, enforced by lint-imports."""
 
 from __future__ import annotations

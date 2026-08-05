@@ -1,3 +1,4 @@
+# This file builds the first database tables: people, accounts, sessions and the audit log.
 """Foundation schema: person, person_identity, user_account, session, audit_log.
 
 Two rules are enforced here, in the database, because they cannot be trusted

@@ -1,3 +1,4 @@
+# This file says what messages the identity module accepts and gives back.
 """Identity contracts. No secrets here — check_no_secrets_in_contracts.py enforces it."""
 
 from __future__ import annotations

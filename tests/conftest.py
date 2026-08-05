@@ -1,3 +1,4 @@
+# Shared helpers the tests use, like a quick pretend database.
 """Shared fixtures. Factories over literals (§7.6).
 
 Module tests run against in-memory SQLite — fast, no daemon. The rules that

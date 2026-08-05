@@ -1,3 +1,4 @@
+# This checker makes sure the design documents were updated when the code changed.
 """Guard: a document's "Last updated" header must not predate its own last commit.
 
 ARCHITECTURE.md §7.8 requires the design documents to be updated with every

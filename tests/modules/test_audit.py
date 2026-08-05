@@ -1,3 +1,4 @@
+# Tests that the audit module writes its notes correctly.
 """Audit: shaping, persistence, and survival across handler failure."""
 
 from __future__ import annotations

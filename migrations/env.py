@@ -1,3 +1,4 @@
+# This file tells Alembic, our database change tool, how to connect and what tables to expect.
 """Alembic environment — async engine, URL from settings, metadata from the modules."""
 
 from __future__ import annotations

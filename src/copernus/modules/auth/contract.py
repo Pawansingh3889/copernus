@@ -1,3 +1,5 @@
+# This file says what messages the auth module accepts and gives back.
+# Secrets are not allowed in here.
 """Auth contracts. No secrets here — check_no_secrets_in_contracts.py enforces it."""
 
 from __future__ import annotations

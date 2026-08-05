@@ -1,3 +1,4 @@
+# This file writes down what the app is doing, so we can look back if something breaks.
 """Structured logging with correlation IDs."""
 
 from __future__ import annotations

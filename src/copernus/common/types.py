@@ -1,3 +1,4 @@
+# This file holds the small data shapes (like Event and Result) that every part of the app shares.
 """Shared types. No I/O, no domain logic — just the vocabulary every module speaks."""
 
 from __future__ import annotations

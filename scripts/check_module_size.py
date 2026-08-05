@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# This checker stops any module growing too big (300 lines) and keeps the engine tiny (under 100).
 """Rule §7.5 — no module over 300 lines, the engine under 100.
 
 The limit is not about aesthetics. A module that outgrows 300 lines has almost

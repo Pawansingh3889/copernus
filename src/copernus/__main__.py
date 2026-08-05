@@ -1,3 +1,4 @@
+# This file starts the app on your own computer so you can try it out.
 """`python -m copernus` — the dev server. Production runs uvicorn directly."""
 
 from __future__ import annotations

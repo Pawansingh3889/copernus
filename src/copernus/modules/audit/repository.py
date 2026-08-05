@@ -1,3 +1,4 @@
+# This file saves the audit notes (who did what) in the database.
 """Audit I/O. Append-only: the migration revokes UPDATE/DELETE and adds a
 trigger that raises on both — C-03 is enforced by the database, not convention."""
 

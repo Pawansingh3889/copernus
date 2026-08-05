@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# This checker stops runnable Python code hiding inside the documentation files.
 """No executable Python inside Markdown.
 
 This repository began as four design documents with two working scripts pasted

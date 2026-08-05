@@ -1,3 +1,4 @@
+# This file saves and loads user accounts and login sessions in the database.
 """Auth I/O: user accounts and server-side sessions."""
 
 from __future__ import annotations

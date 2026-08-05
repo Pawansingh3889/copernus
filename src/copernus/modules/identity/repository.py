@@ -1,3 +1,4 @@
+# This file saves and loads people in the database.
 """Identity I/O. person is permanent; person_identity is the only deletable table."""
 
 from __future__ import annotations

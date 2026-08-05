@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# This checker fails the build if the tests cover too little of any module's code.
 """Per-module coverage floors, declared in pyproject.toml.
 
 A single global `--cov-fail-under=80` is a weaker check than it looks. Coverage

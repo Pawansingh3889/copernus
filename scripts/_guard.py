@@ -1,3 +1,4 @@
+# Helper code that all the checker scripts share.
 """Shared helpers for the guard scripts.
 
 Every guard here obeys one rule that is easy to state and easy to get wrong:

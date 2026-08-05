@@ -1,3 +1,4 @@
+# Tests logging in and out through both doors: JSON and web pages.
 """The auth flow over HTTP, both adapters, one wired app on SQLite."""
 
 from __future__ import annotations

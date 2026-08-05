@@ -1,3 +1,4 @@
+# This file says what messages the audit module accepts and gives back.
 """Audit contracts."""
 
 from __future__ import annotations

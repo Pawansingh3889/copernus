@@ -1,3 +1,4 @@
+# The identity module: it keeps track of people and who they are.
 """Identity module: handle(event, state) -> Result. The engine wires everything."""
 
 from __future__ import annotations

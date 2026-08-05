@@ -1,3 +1,4 @@
+# This file holds the login rules, like checking a password. It never touches the database.
 """Auth rules. Pure/deterministic where it matters; no I/O, enforced by lint-imports.
 
 bcrypt and hashlib are CPU, not I/O — the tests need no database and no mocks.

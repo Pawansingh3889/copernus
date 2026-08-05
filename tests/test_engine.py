@@ -1,3 +1,4 @@
+# Tests that the engine sends each job to the right module.
 """Engine behaviour: routing, permissions, audit, and failure isolation."""
 
 from __future__ import annotations

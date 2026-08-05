@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# This checker makes sure no passwords or secrets sneak into the contract files.
 """Rule §7.4 / constraint C-08 — no secret literal in a contract module.
 
 `contract.py` files describe the shape of a module's inputs and outputs. They

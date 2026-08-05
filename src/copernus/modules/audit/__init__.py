@@ -1,3 +1,4 @@
+# The audit module: it writes down who did what and when, so nothing is forgotten.
 """Audit module: handle(event, state) -> Result."""
 
 from __future__ import annotations

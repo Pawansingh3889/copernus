@@ -1,3 +1,4 @@
+# Tests that every checker script really catches the mistake it exists to catch.
 """Prove every gate rejects a planted violation.
 
 A guard that has never been observed to fail is decoration. Green output tells

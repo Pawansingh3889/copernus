@@ -1,3 +1,4 @@
+# This file builds the app and plugs all the parts together, like the baseplate of a Lego set.
 """FastAPI app factory — the composition root.
 
 The one place allowed to import both adapters: it sits above api|ui in the

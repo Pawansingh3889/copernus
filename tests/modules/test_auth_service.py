@@ -1,3 +1,4 @@
+# Tests the login rules on their own, like password checking.
 """Pure auth rules — no database, no mocks."""
 
 from __future__ import annotations

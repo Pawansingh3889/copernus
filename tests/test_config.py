@@ -1,3 +1,4 @@
+# Tests that the settings load correctly.
 """Settings come from COP_-prefixed environment, with safe defaults."""
 
 from __future__ import annotations

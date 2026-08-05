@@ -1,3 +1,4 @@
+# Tests the rules only a real Postgres database can enforce.
 """The rules only Postgres can enforce, proven against a real Postgres.
 
 Skipped unless COP_TEST_PG_DSN is set (e.g. postgresql://copernus:copernus@localhost:5433/copernus

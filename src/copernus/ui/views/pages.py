@@ -1,3 +1,5 @@
+# This file draws the web pages. It asks the same modules as the machine door,
+# but answers with HTML instead of JSON.
 """HTML adapter: server-rendered pages, HTMX for the fragments.
 
 Calls the same engine handlers as the JSON adapter. Renders HTML instead of

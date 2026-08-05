@@ -1,3 +1,4 @@
+# Tests the auth module end to end: sign up, log in, log out.
 """Auth flow through the engine — UC-01 acceptance criteria."""
 
 from __future__ import annotations

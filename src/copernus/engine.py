@@ -1,3 +1,5 @@
+# This file is the traffic officer. A job comes in, it sends the job to the right module,
+# and passes the answer back.
 """The event engine.
 
 Routes an event to a module handler and returns the result. That is all it

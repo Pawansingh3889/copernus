@@ -1,3 +1,4 @@
+# This file lists the ways things can go wrong, and gives each one its own name.
 """Domain errors.
 
 Every error carries a code so the API can map it to a status without matching

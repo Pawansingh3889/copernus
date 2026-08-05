@@ -1,3 +1,4 @@
+# Tests the identity module: creating and finding people.
 """Identity: creation, resolution, and the C-12 severance guarantee."""
 
 from __future__ import annotations

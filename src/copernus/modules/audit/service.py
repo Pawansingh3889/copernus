@@ -1,3 +1,4 @@
+# This file holds the rules for writing an audit note. It never touches the database.
 """Audit rules. Pure functions — no I/O, enforced by lint-imports."""
 
 from __future__ import annotations

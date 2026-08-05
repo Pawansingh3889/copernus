@@ -1,3 +1,4 @@
+# The auth module: signing up, logging in, logging out.
 """Auth module: handle(event, state) -> Result.
 
 An account is credentials, not a person: registration stores person_id=None,

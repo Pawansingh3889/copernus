@@ -1,3 +1,4 @@
+# This file reads the app's settings, like where the database lives.
 """Configuration from environment / .env. Units in names, no literals in code."""
 
 from __future__ import annotations

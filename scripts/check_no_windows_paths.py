@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# This checker stops Windows-style paths like C:/ from getting into the project.
 """No Windows drive-letter paths in code or documentation.
 
 A regression guard. No `C:/` path exists in this repository today, and the

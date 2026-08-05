@@ -1,3 +1,4 @@
+# This file opens the connection to the database so other files can save and load things.
 """Database plumbing: one MetaData, one engine factory, one session factory.
 
 Modules define their tables on this metadata inside their repository.py.
