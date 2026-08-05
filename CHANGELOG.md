@@ -24,6 +24,17 @@ versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- `ARCHITECTURE.md` §8: three assistant decisions recorded ahead of Phases 8–9 —
+  prompts are code (source tree, eval-gated on every change), captured shop-floor
+  text enters prompts as data never instructions (prompt isolation as
+  architecture), and every assistant record carries model id, prompt version,
+  token counts and cost, with prompt caching over the stable corpus. `ROADMAP.md`
+  P9 builds/gate updated to match.
+- `docs/domain/business-rules.md` §5: intake lot code decoded — `F6160B` = fresh ·
+  2026 · Julian day 160 · second batch of the day. Day 160 is 9 June, two days
+  before the tag's printed 11.06 harvest date, so the code anchors an earlier
+  event (wellboat loading, likeliest — unverified); printed dates stay
+  authoritative and the code stays opaque (`data-model.md` §1 cross-references).
 - `make gate` now includes `typecheck` (strict mypy), so CI enforces it on every
   push; `tests/test_gates.py` proves it rejects a planted type error from a cold
   cache.

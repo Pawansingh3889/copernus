@@ -1,6 +1,6 @@
 # Copernus — Roadmap
 
-> **Last updated:** 4 August 2026
+> **Last updated:** 5 August 2026
 > **Owner:** Pawansingh3889
 > **Horizon:** 12 phases, ~2 weeks each, demo at the end.
 > **Headline:** end the paperwork — BRCGS readiness and the second team
@@ -34,7 +34,7 @@ P12 Hardening + demo ──── gate: cold-start demo by someone who didn't bu
 | 6 | **Ingest + reconciliation** | Extract → artefact, atomic swap, stale banner; mass-balance gate; despatch priority (recovered tracker logic + chasing rule) | In = out + WIP within tolerance; shelf life matches the tracker exactly (Oracle 2); discrepancy blocks — fix the cause, never widen the tolerance |
 | 7 | **Traceability** | Genealogy edge table (append-only, quantity per edge), directed two-phase traversal with depth cap and visited guard, trace UI with lineage + balance together | Recall drill vs hand-trace: same set including siblings, faster, terminates on the cyclic fixture |
 | 8 | **Corpus** | Source register (licence tiers: OGL / free-copyrighted / paid-never-in-repo), fetchers for legislation.gov.uk, FSA, HSE; versioned store; site SOPs via the capture engine | Every chunk carries source, version, licence tier; no tier-3 text anywhere in the repo |
-| 9 | **Grounded assistant** | The pipeline in ARCHITECTURE.md §8: routing, chained stages, parallel voting, verifier, judge, sign-off; multilingual capture → English record; eval harness | Eval passes; zero uncited answers; judge calibrated against human labels before it gates |
+| 9 | **Grounded assistant** | The pipeline in ARCHITECTURE.md §8: routing, chained stages, parallel voting, verifier, judge, sign-off; multilingual capture → English record; eval harness; prompts in the source tree, captured text isolated as data, model/prompt/token/cost on every record | Eval passes on every prompt change as well as every model change; zero uncited answers; judge calibrated against human labels before it gates |
 | 10 | **H&S module** | Incident + near-miss capture on the Phase-1 identity schema; corrective actions with owners; RIDDOR draft (reasoning shown, human files); registers via the capture engine; toolbox talks from own near-misses | Erasing a person severs identity without breaking the audit chain — demonstrated, not asserted |
 | 11 | **Dashboards + alerts** | Temperature excursions, giveaway from checkweigher summaries, concession rate, near-miss rate; alert dedupe, acknowledge, rate-limit; React island only if a page earns it | Trends render from captured data only; acknowledged alerts don't re-fire |
 | 12 | **Hardening + demo** | Oracle re-run recorded; demo script on the headline; de-identified demo pack; dry runs; business impact in headcount and BRCGS-readiness terms | Someone who didn't build it drives the demo cold from the README |

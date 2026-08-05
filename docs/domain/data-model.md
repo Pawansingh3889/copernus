@@ -29,6 +29,10 @@ FROM raw_material rm JOIN finished_goods fg ON rm.batch_code = fg.batch_code
 namespaces that happen to share a column name. It will not error. It will return a small,
 plausible, wrong result set — the worst failure mode available.
 
+The intake code has internal structure too — observed on one supplier: state letter, year digit,
+Julian day, batch letter (business-rules §5) — but model it as opaque: the encoded day names a
+different event than the tag's printed dates, and only the printed dates are load-bearing.
+
 **Model them as distinct, differently-named columns**: `material_lot_code` and `run_number`. A trap
 inside the trap: run numbers are **zero-padded** — `035366` is what screens and labels carry, and
 the source system stores the column as a string, so the leading zero is significant in any match

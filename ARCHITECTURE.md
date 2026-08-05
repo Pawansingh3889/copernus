@@ -1,6 +1,6 @@
 # Copernus — Architecture
 
-> **Last updated:** 4 August 2026
+> **Last updated:** 5 August 2026
 > **Update rule:** updated with every structural change (§7.8, mechanised by
 > `scripts/check_doc_freshness.py`).
 
@@ -134,6 +134,22 @@ Every stage stores a reasoning trace — adaptive thinking summary plus a
 structured rationale field — with the record, for the approver and the
 auditor. Model: `claude-opus-5` at every stage until the Phase 9 eval
 harness justifies anything cheaper.
+
+Three more decisions, recorded now because none of them retrofits cleanly:
+
+- **Prompts are code.** Every prompt lives in the assistant's source tree,
+  versioned like any other file, and every prompt change reruns the Phase 9
+  eval set before it merges — the same gate a model upgrade gets. No prompt
+  in application config, ever.
+- **Captured text is data, never instructions.** Incident narratives,
+  multilingual capture and every other shop-floor free text enter prompts as
+  delimited, quoted data; nothing a user types can address the model. Prompt
+  isolation is architecture, not an add-on — decided here for the same
+  reason C-12 was decided before the first row existed.
+- **Every assistant record carries its economics.** Model id, prompt
+  version, token counts and cost land on the record at write time, and the
+  stable regulatory corpus is served through prompt caching from day one. A
+  cost question answered by grepping logs is answered too late.
 
 ## 9. Tech stack
 

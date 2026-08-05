@@ -163,6 +163,15 @@ and 29.06.26: the same eighteen days, to the day, across a different supplier an
 origins on otherwise identical tags is also §6's region-of-capture row seen from the intake side:
 region travels with the batch.
 
+The lot code itself decodes — `F`·`6`·`160`·`B`: **F** for fresh, **6** for 2026, **160** the
+Julian day of year, **B** the second batch of that day. But day 160 of 2026 is **9 June**, two
+days before the 11.06 harvest/kill date on the same tag (use-by − 18 lands on 11.06 exactly). So
+the code and the printed dates anchor two events two days apart — the shape of the wellboat-transit
+lag the original C3 worried about. Likeliest reading: the lot is opened when the wellboat loads,
+and the kill happens on arrival two days later; but that is unverified. Until it is, the printed
+dates are authoritative and the code stays an **opaque identifier** — parse it for sanity checks if
+ever needed, never for a date the tag states explicitly.
+
 **All answered (2026-08-04):**
 
 | # | Answer | Consequence |
