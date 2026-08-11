@@ -1,6 +1,6 @@
 # Copernus — Architecture
 
-> **Last updated:** 5 August 2026
+> **Last updated:** 11 August 2026
 > **Update rule:** updated with every structural change (§7.8, mechanised by
 > `scripts/check_doc_freshness.py`).
 
@@ -97,7 +97,7 @@ application-level half, and the pg-marked probes prove the database half.
 | # | Rule | Enforced by |
 |---|---|---|
 | 7.1 | No module imports a sibling | `lint-imports` independence contract |
-| 7.2 | No I/O in service.py | `lint-imports` forbidden contract (`anthropic` is already on the list for Phase 8) |
+| 7.2 | No I/O in service.py | `lint-imports` forbidden contract (`anthropic` and `openai` are already on the list for Phase 8) |
 | 7.3 | No request without audit | engine + sink; test proves survival across a crashing handler |
 | 7.4 | No secret in contract.py | `scripts/check_no_secrets_in_contracts.py` |
 | 7.5 | No module >300 lines, engine <100 | `scripts/check_module_size.py` |
@@ -132,8 +132,36 @@ request → ROUTER → operational?  → deterministic service (NO LLM — the
 
 Every stage stores a reasoning trace — adaptive thinking summary plus a
 structured rationale field — with the record, for the approver and the
-auditor. Model: `claude-opus-5` at every stage until the Phase 9 eval
-harness justifies anything cheaper.
+auditor.
+
+**Models: on-prem, two families (decided 11 August 2026).** Nothing the
+pipeline sees leaves site. Incident narratives carry special-category
+personal data (injuries), the plant cannot depend on an internet link
+mid-shift, and the client mandates on-prem regardless. No cloud fallback
+and no scrub-then-send path; that door stays shut unless a DPIA opens it
+in writing.
+
+- **Workhorse** (router, RAG, extraction, translation, voting):
+  `Qwen3.6-27B` dense, Apache 2.0. Coverage of 119 languages carries the
+  shop floor (Polish, Romanian, Lithuanian, Latvian), 256K context holds
+  whole corpus sections, and Q4 quantisation fits a 24 GB card.
+- **Judge:** `gpt-oss-20b`, Apache 2.0. A different lab and different
+  training data, so it disagrees with the workhorse instead of nodding
+  along. It only ever reads the English record (translation happens
+  upstream), so its weak multilingual scores never touch the pipeline.
+- **Serving:** vLLM on a dedicated Linux GPU box, OpenAI-compatible
+  endpoint. repository.py stays a thin adapter, so a model swap is a
+  config change plus the eval rerun. Guided decoding enforces the
+  verifier's schemas at generation time; automatic prefix caching is how
+  the corpus-caching promise below is kept without a cloud.
+- **Sizing:** under ten concurrent users. One 48 GB card runs both models
+  resident; 2x 24 GB works with one model per card. Inventory of the
+  site's seven servers is pending; until it lands, a single-48 GB-card
+  box is the procurement assumption.
+
+Provisional like every model choice: the Phase 9 eval harness gates it,
+and the eval set carries Polish, Romanian, Lithuanian and Latvian
+incident samples from day one.
 
 Three more decisions, recorded now because none of them retrofits cleanly:
 
@@ -160,5 +188,6 @@ Three more decisions, recorded now because none of them retrofits cleanly:
 | Frontend | Jinja2 + HTMX (vendored), no build step | Forms on gloved tablets; the JSON API keeps the React door open |
 | Auth | bcrypt + server-side sessions, HttpOnly cookie | Revocable instantly; nothing stored client-side but the token |
 | Migrations | Alembic (async) | Hand-written where DDL carries policy (triggers, grants) |
+| Inference | vLLM serving Qwen3.6-27B (workhorse) + gpt-oss-20b (judge) on a dedicated Linux GPU box | Personal data never leaves site (§8); OpenAI-compatible, so a model swap is config plus the eval rerun |
 | Tests | pytest, SQLite in-memory for logic, pg-marked probes for grants | Fast by default, honest where the database is the mechanism |
 | CI | GitHub Actions running `make gate` | Same command locally and in CI |

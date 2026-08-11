@@ -98,6 +98,7 @@ forbidden_modules = [
     "sqlite3",
     "httpx",
     "anthropic",
+    "openai",
     "socket",
     "urllib",
 ]
@@ -106,8 +107,9 @@ ARCHITECTURE.md §7.2. service.py holds business logic as pure functions,
 testable with no database, no network, and no clock beyond what is passed in.
 Forbidding the sibling repository import is the load-bearing half: it is the
 convenient shortcut, and the one that would otherwise happen first. anthropic
-is on the list now so the rule is already true when the assistant module
-lands in Phase 8 — LLM calls are I/O and belong in repository.py.
+and openai are on the list now so the rule is already true when the assistant
+module lands in Phase 8 (the on-prem vLLM endpoint speaks the OpenAI
+protocol): LLM calls are I/O and belong in repository.py.
 """
 
 # ---------------------------------------------------------------------------
