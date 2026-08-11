@@ -180,7 +180,29 @@ Models are held to the equivalent standard.
 Each of these is enforced by the architecture rather than by instructions to
 the model, which is why it can be stated this plainly.
 
-## 9. Sequence
+## 9. What changes for the people doing this work
+
+Every check described in section 3 still happens, at the same cadence,
+performed by the same people. Metal detection is still hourly and still
+read by an operative. Temperature is still hourly. Label verification still
+happens at every reel change. Clean-down is still inspected and released by
+a team leader. The tasting decision behind a concession is still a judgement
+made by people, and every run is still signed off by a person.
+
+What stops is the second copy: reading a number off a display and writing it
+onto a form, filing paper that is never read again, walking the coldstore
+for fifteen minutes to answer a question the current screen cannot ask, and
+hand-tracing a recall under time pressure.
+
+The time that releases goes back into the checks themselves and onto the
+floor, not out of the headcount. The case for this project is audit
+readiness and the speed of a recall, and it does not depend on removing
+anybody. That is worth saying out loud early, because a project whose
+headline is "end the paperwork" will otherwise be heard as something else on
+the shop floor, and a system the people using it distrust will be fed bad
+data no matter how well it is built.
+
+## 10. Sequence
 
 | Phase | Builds | Gate |
 |---|---|---|
@@ -191,7 +213,7 @@ the model, which is why it can be stated this plainly.
 This chain is independent of the traceability work, so it can move right
 without touching the paperwork story if time runs short.
 
-## 10. What is being asked
+## 11. What is being asked
 
 Agreement on four points, so that Phase 8 can begin and the hardware
 conversation can proceed separately.
