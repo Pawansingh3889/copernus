@@ -45,6 +45,7 @@ src/copernus/
 migrations/           alembic; 0001 carries the C-03 trigger + grants
 scripts/              guard scripts — every one proven to fail in tests/test_gates.py
 docs/domain/          ported from dora-factory @24803d9 — read before querying anything
+docs/architecture.html the drawn version: two figures and the layer table
 ```
 
 ## Rules that will bite you if you skip them
