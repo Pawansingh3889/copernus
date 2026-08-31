@@ -1,0 +1,503 @@
+<title>FloorMind Architecture</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --ground:   #F2F5F4;
+    --surface:  #FFFFFF;
+    --sunk:     #E7ECEA;
+    --ink:      #131B1A;
+    --steel:    #5E7173;
+    --hair:     #CBD5D3;
+    --chill:    #10687A;
+    --chill-bg: #E2EFF1;
+    --signal:   #A94A19;
+    --signal-bg:#F7E9E0;
+    --sealed:   #7A2933;
+    --sealed-bg:#F5E4E5;
+    --shadow:   0 1px 2px rgba(19,27,26,.05), 0 8px 24px -12px rgba(19,27,26,.18);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:   #0D1312;
+      --surface:  #161F1E;
+      --sunk:     #1E2827;
+      --ink:      #E4EBE9;
+      --steel:    #93A5A6;
+      --hair:     #2C3937;
+      --chill:    #55B9CB;
+      --chill-bg: #123039;
+      --signal:   #E29160;
+      --signal-bg:#332014;
+      --sealed:   #DD8189;
+      --sealed-bg:#331A1E;
+      --shadow:   0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:   #0D1312;
+    --surface:  #161F1E;
+    --sunk:     #1E2827;
+    --ink:      #E4EBE9;
+    --steel:    #93A5A6;
+    --hair:     #2C3937;
+    --chill:    #55B9CB;
+    --chill-bg: #123039;
+    --signal:   #E29160;
+    --signal-bg:#332014;
+    --sealed:   #DD8189;
+    --sealed-bg:#331A1E;
+    --shadow:   0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 56px 28px 96px;
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+  }
+
+  .eyebrow {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--steel);
+  }
+
+  /* ---- masthead ---- */
+  .masthead { display: flex; flex-direction: column; gap: 18px; }
+  .masthead h1 {
+    font-family: "Barlow Condensed", "IBM Plex Sans", sans-serif;
+    font-weight: 700;
+    font-size: clamp(44px, 7vw, 78px);
+    line-height: .95;
+    letter-spacing: -.01em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .masthead h1 span { color: var(--chill); }
+  .standfirst {
+    max-width: 62ch;
+    font-size: 17px;
+    color: var(--steel);
+    margin: 0;
+  }
+  .rule { height: 3px; background: var(--ink); }
+  .meta {
+    display: flex; flex-wrap: wrap; gap: 8px 28px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px; color: var(--steel);
+  }
+  .meta b { color: var(--ink); font-weight: 600; }
+
+  /* ---- thesis ---- */
+  .thesis {
+    background: var(--surface);
+    border: 1px solid var(--hair);
+    border-left: 4px solid var(--sealed);
+    border-radius: 3px;
+    padding: 26px 30px;
+    box-shadow: var(--shadow);
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .thesis p { margin: 0; font-size: 19px; line-height: 1.5; max-width: 70ch; }
+  .thesis strong { color: var(--sealed); font-weight: 600; }
+
+  /* ---- sections ---- */
+  section { display: flex; flex-direction: column; gap: 20px; }
+  h2 {
+    font-family: "Barlow Condensed", sans-serif;
+    font-weight: 600;
+    font-size: 34px;
+    letter-spacing: .01em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .lede { margin: 0; max-width: 68ch; color: var(--steel); }
+
+  figure { margin: 0; display: flex; flex-direction: column; gap: 14px; }
+  .figbox {
+    background: var(--surface);
+    border: 1px solid var(--hair);
+    border-radius: 3px;
+    padding: 22px;
+    overflow-x: auto;
+    box-shadow: var(--shadow);
+  }
+  .figbox svg { display: block; width: 100%; min-width: 820px; height: auto; }
+  figcaption {
+    font-size: 13.5px; color: var(--steel); max-width: 76ch;
+    padding-left: 14px; border-left: 2px solid var(--hair);
+  }
+
+  /* svg type */
+  .n-title { font-family: "IBM Plex Mono", monospace; font-size: 13px; font-weight: 600; }
+  .n-sub   { font-family: "IBM Plex Sans", sans-serif; font-size: 11.5px; }
+  .n-lab   { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; }
+  .n-edge  { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; }
+
+  /* ---- table ---- */
+  .tablewrap { overflow-x: auto; border: 1px solid var(--hair); border-radius: 3px; background: var(--surface); box-shadow: var(--shadow); }
+  table { border-collapse: collapse; width: 100%; min-width: 860px; }
+  thead th {
+    text-align: left;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--surface); background: var(--ink);
+    padding: 13px 18px;
+    white-space: nowrap;
+  }
+  tbody td { padding: 16px 18px; border-top: 1px solid var(--hair); vertical-align: top; font-size: 14px; }
+  tbody tr:nth-child(odd) td { background: var(--sunk); }
+  .lyr { white-space: nowrap; }
+  .lyr .num {
+    font-family: "Barlow Condensed", sans-serif; font-weight: 700; font-size: 26px;
+    color: var(--chill); font-variant-numeric: tabular-nums; margin-right: 9px;
+  }
+  .lyr .nm { font-weight: 600; }
+  .stack { font-family: "IBM Plex Mono", monospace; font-size: 12.5px; line-height: 1.55; }
+  .why { color: var(--steel); max-width: 46ch; }
+
+  /* ---- contrast cards ---- */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(272px, 1fr)); gap: 16px; }
+  .card {
+    background: var(--surface); border: 1px solid var(--hair); border-radius: 3px;
+    padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;
+    box-shadow: var(--shadow);
+  }
+  .card h3 { margin: 0; font-family: "Barlow Condensed", sans-serif; font-weight: 600; font-size: 22px; }
+  .card p { margin: 0; font-size: 14px; color: var(--steel); }
+  .tag {
+    align-self: flex-start;
+    font-family: "IBM Plex Mono", monospace; font-size: 10px; font-weight: 600;
+    letter-spacing: .12em; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 2px;
+  }
+  .t-seal { background: var(--sealed-bg); color: var(--sealed); }
+  .t-chill { background: var(--chill-bg); color: var(--chill); }
+  .t-sig { background: var(--signal-bg); color: var(--signal); }
+
+  footer {
+    border-top: 1px solid var(--hair); padding-top: 22px;
+    font-size: 13px; color: var(--steel); max-width: 74ch;
+  }
+  footer code { font-family: "IBM Plex Mono", monospace; font-size: .92em; color: var(--ink); }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="eyebrow">Copernus &middot; chilled-fish processing &middot; BRC audited</div>
+    <h1>FloorMind<br><span>architecture</span></h1>
+    <div class="rule"></div>
+    <p class="standfirst">An auditable assistant over a plant that runs on paper. One FastAPI process, one Postgres, two adapters, and a language model that is kept away from every question with a right answer.</p>
+    <div class="meta">
+      <span><b>Source</b> ARCHITECTURE.md &sect;8, &sect;9</span>
+      <span><b>Models decided</b> 11 Aug 2026</span>
+      <span><b>Deployment</b> on-premise, no cloud fallback</span>
+    </div>
+  </header>
+
+  <div class="thesis">
+    <div class="eyebrow">The rule that shapes everything below</div>
+    <p><strong>A model is never asked</strong> how many days a batch has left, what a run yielded, what should be loaded next, whether the mass balance holds, or what a batch&rsquo;s parents and children are. Every one of those has a right answer a query can produce. They are answered by ordinary code, and the request never reaches a model.</p>
+  </div>
+
+  <section>
+    <div class="eyebrow">Figure 1</div>
+    <h2>The system</h2>
+    <p class="lede">A monolith with enforced seams. The seams are import contracts checked by <code>make gate</code>, not conventions, so it can be split later along lines that provably held.</p>
+
+    <figure>
+      <div class="figbox">
+        <svg viewBox="0 0 1180 640" role="img" aria-label="FloorMind system architecture: existing site systems are read only; a single FastAPI monolith exposes two adapters over one engine and six modules, backed by Postgres and an audit log, with on-premise vLLM inference inside a site boundary that nothing crosses.">
+          <defs>
+            <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+            </marker>
+            <marker id="ar-c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--chill)"/>
+            </marker>
+          </defs>
+
+          <!-- site boundary -->
+          <rect x="12" y="112" width="1156" height="516" rx="4" fill="none" stroke="var(--sealed)" stroke-width="1.5" stroke-dasharray="7 5"/>
+          <text class="n-lab" x="26" y="620" fill="var(--sealed)">Site boundary &middot; nothing the pipeline sees leaves</text>
+
+          <!-- band 1: site systems -->
+          <text class="n-lab" x="26" y="22" fill="currentColor">Existing site systems &middot; read, never rebuilt</text>
+          <g fill="var(--sunk)" stroke="var(--hair)">
+            <rect x="26" y="34" width="330" height="52" rx="3"/>
+            <rect x="374" y="34" width="330" height="52" rx="3"/>
+            <rect x="722" y="34" width="330" height="52" rx="3"/>
+          </g>
+          <text class="n-title" x="191" y="58" text-anchor="middle" fill="currentColor">SI (Integreater) ERP</text>
+          <text class="n-sub" x="191" y="74" text-anchor="middle" fill="var(--steel)">40+ databases, sharded OCM</text>
+          <text class="n-title" x="539" y="58" text-anchor="middle" fill="currentColor">Stock Tracker</text>
+          <text class="n-sub" x="539" y="74" text-anchor="middle" fill="var(--steel)">shelf life per batch, already trusted</text>
+          <text class="n-title" x="887" y="58" text-anchor="middle" fill="currentColor">Yield Report</text>
+          <text class="n-sub" x="887" y="74" text-anchor="middle" fill="var(--steel)">in kilos, out kilos, yield per run</text>
+
+          <line x1="191" y1="86" x2="191" y2="150" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar)"/>
+          <text class="n-edge" x="201" y="122" fill="var(--steel)">read-only</text>
+
+          <!-- monolith -->
+          <rect x="26" y="150" width="800" height="330" rx="4" fill="var(--surface)" stroke="currentColor" stroke-width="1.6"/>
+          <text class="n-lab" x="42" y="172" fill="currentColor">copernus.app &middot; one process, one Postgres</text>
+
+          <!-- adapters -->
+          <rect x="44" y="186" width="372" height="46" rx="3" fill="var(--sunk)" stroke="var(--hair)"/>
+          <rect x="436" y="186" width="372" height="46" rx="3" fill="var(--sunk)" stroke="var(--hair)"/>
+          <text class="n-title" x="230" y="205" text-anchor="middle" fill="currentColor">ui &middot; HTMX + Jinja2</text>
+          <text class="n-sub" x="230" y="221" text-anchor="middle" fill="var(--steel)">gloved hands, wet tablet, no build step</text>
+          <text class="n-title" x="622" y="205" text-anchor="middle" fill="currentColor">api &middot; JSON /api/v1</text>
+          <text class="n-sub" x="622" y="221" text-anchor="middle" fill="var(--steel)">same capability, second adapter</text>
+
+          <line x1="230" y1="232" x2="230" y2="258" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar)"/>
+          <line x1="622" y1="232" x2="622" y2="258" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar)"/>
+
+          <!-- engine -->
+          <rect x="44" y="258" width="764" height="46" rx="3" fill="var(--chill-bg)" stroke="var(--chill)" stroke-width="1.4"/>
+          <text class="n-title" x="426" y="277" text-anchor="middle" fill="var(--chill)">engine.dispatch()</text>
+          <text class="n-sub" x="426" y="293" text-anchor="middle" fill="var(--chill)">route &middot; permit &middot; audit &middot; isolate (C-09) &mdash; under 100 lines</text>
+
+          <line x1="426" y1="304" x2="426" y2="330" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar)"/>
+
+          <!-- modules -->
+          <text class="n-lab" x="44" y="324" fill="var(--steel)">modules &middot; one capability, four files</text>
+          <g stroke="var(--hair)" fill="var(--sunk)">
+            <rect x="44" y="330" width="243" height="44" rx="3"/>
+            <rect x="303" y="330" width="243" height="44" rx="3"/>
+            <rect x="562" y="330" width="246" height="44" rx="3"/>
+            <rect x="44" y="384" width="243" height="44" rx="3"/>
+            <rect x="303" y="384" width="243" height="44" rx="3"/>
+          </g>
+          <rect x="562" y="384" width="246" height="44" rx="3" fill="var(--chill-bg)" stroke="var(--chill)" stroke-width="1.6"/>
+          <text class="n-title" x="165" y="357" text-anchor="middle" fill="currentColor">auth</text>
+          <text class="n-title" x="424" y="357" text-anchor="middle" fill="currentColor">identity &middot; C-12</text>
+          <text class="n-title" x="685" y="357" text-anchor="middle" fill="currentColor">audit &middot; C-03</text>
+          <text class="n-title" x="165" y="411" text-anchor="middle" fill="currentColor">qcheck</text>
+          <text class="n-title" x="424" y="411" text-anchor="middle" fill="currentColor">checklist</text>
+          <text class="n-title" x="685" y="411" text-anchor="middle" fill="var(--chill)">assistant</text>
+
+          <text class="n-sub" x="426" y="458" text-anchor="middle" fill="var(--steel)">service.py is pure rules and no I/O &middot; repository.py owns every query &middot; enforced by lint-imports</text>
+
+          <!-- right column -->
+          <rect x="856" y="186" width="296" height="64" rx="3" fill="var(--surface)" stroke="currentColor" stroke-width="1.4"/>
+          <text class="n-title" x="1004" y="211" text-anchor="middle" fill="currentColor">Postgres 16</text>
+          <text class="n-sub" x="1004" y="228" text-anchor="middle" fill="var(--steel)">grants and triggers carry policy</text>
+          <line x1="826" y1="215" x2="856" y2="215" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar)"/>
+
+          <rect x="856" y="272" width="296" height="64" rx="3" fill="var(--signal-bg)" stroke="var(--signal)" stroke-width="1.4"/>
+          <text class="n-title" x="1004" y="297" text-anchor="middle" fill="var(--signal)">audit_log &middot; C-03</text>
+          <text class="n-sub" x="1004" y="314" text-anchor="middle" fill="var(--signal)">its own transaction</text>
+          <text class="n-sub" x="1004" y="352" text-anchor="middle" fill="var(--steel)">a rolled-back request still leaves its row</text>
+
+          <!-- inference -->
+          <rect x="856" y="384" width="296" height="78" rx="3" fill="var(--surface)" stroke="var(--chill)" stroke-width="1.6"/>
+          <text class="n-title" x="1004" y="409" text-anchor="middle" fill="var(--chill)">vLLM &middot; dedicated GPU box</text>
+          <text class="n-sub" x="1004" y="426" text-anchor="middle" fill="currentColor">Qwen3.6-27B workhorse</text>
+          <text class="n-sub" x="1004" y="442" text-anchor="middle" fill="currentColor">gpt-oss-20b judge</text>
+          <line x1="808" y1="406" x2="856" y2="410" stroke="var(--chill)" stroke-width="1.6" marker-end="url(#ar-c)"/>
+          <text class="n-edge" x="812" y="382" fill="var(--chill)">OpenAI-compatible</text>
+
+          <!-- gates strip -->
+          <rect x="26" y="506" width="800" height="76" rx="3" fill="var(--sunk)" stroke="var(--hair)"/>
+          <text class="n-lab" x="42" y="530" fill="currentColor">Gates &amp; evidence</text>
+          <text class="n-sub" x="42" y="551" fill="currentColor">make gate &mdash; ruff &middot; mypy &middot; lint-imports &middot; guards &middot; pytest &mdash; run identically in GitHub Actions</text>
+          <text class="n-sub" x="42" y="569" fill="var(--steel)">Phase 9 eval harness gates every model and every prompt change &middot; prompts live in the source tree</text>
+
+          <rect x="856" y="506" width="296" height="76" rx="3" fill="var(--sunk)" stroke="var(--hair)"/>
+          <text class="n-lab" x="872" y="530" fill="currentColor">On every record</text>
+          <text class="n-sub" x="872" y="551" fill="currentColor">model id &middot; prompt version</text>
+          <text class="n-sub" x="872" y="569" fill="currentColor">token counts &middot; cost, at write time</text>
+        </svg>
+      </div>
+      <figcaption>The dashed boundary is the whole point of the inference box sitting inside it. Incident narratives carry special-category personal data, the plant cannot depend on an internet link mid-shift, and the client mandates on-premise regardless. There is no cloud fallback and no scrub-then-send path.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <div class="eyebrow">Figure 2</div>
+    <h2>Where the request goes</h2>
+    <p class="lede">Two lanes leave the router, and the short one carries most of the traffic. A model that is asked for a shelf-life figure is a model that can be wrong about a shelf-life figure.</p>
+
+    <figure>
+      <div class="figbox">
+        <svg viewBox="0 0 1180 430" role="img" aria-label="Request routing: operational questions take a short deterministic path with no model; language work takes a longer path through a verifier, an adversarial judge, and a named human sign-off.">
+          <defs>
+            <marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+            </marker>
+            <marker id="ar2-s" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--sealed)"/>
+            </marker>
+          </defs>
+
+          <!-- request + router -->
+          <rect x="14" y="186" width="86" height="46" rx="3" fill="var(--sunk)" stroke="var(--hair)"/>
+          <text class="n-title" x="57" y="214" text-anchor="middle" fill="currentColor">request</text>
+          <line x1="100" y1="209" x2="128" y2="209" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar2)"/>
+          <rect x="128" y="180" width="118" height="58" rx="3" fill="var(--ink)" stroke="var(--ink)"/>
+          <text class="n-title" x="187" y="206" text-anchor="middle" fill="var(--surface)">ROUTER</text>
+          <text class="n-sub" x="187" y="223" text-anchor="middle" fill="var(--surface)">one fork</text>
+
+          <!-- lane A: operational -->
+          <text class="n-lab" x="290" y="34" fill="var(--sealed)">Operational &middot; has a right answer</text>
+          <path d="M246 196 C 276 196, 276 92, 300 92" fill="none" stroke="var(--sealed)" stroke-width="2" marker-end="url(#ar2-s)"/>
+          <text class="n-edge" x="252" y="130" fill="var(--sealed)">operational</text>
+
+          <rect x="308" y="46" width="300" height="80" rx="3" fill="var(--sealed-bg)" stroke="var(--sealed)" stroke-width="1.8"/>
+          <text class="n-title" x="458" y="76" text-anchor="middle" fill="var(--sealed)">deterministic service</text>
+          <text class="n-sub" x="458" y="94" text-anchor="middle" fill="var(--sealed)">ordinary code, a query, no model</text>
+          <text class="n-lab" x="458" y="114" text-anchor="middle" fill="var(--sealed)">the request never reaches an LLM</text>
+
+          <line x1="608" y1="86" x2="856" y2="86" stroke="var(--sealed)" stroke-width="2" marker-end="url(#ar2-s)"/>
+
+          <rect x="864" y="46" width="302" height="80" rx="3" fill="var(--surface)" stroke="var(--sealed)" stroke-width="1.8"/>
+          <text class="n-title" x="1015" y="76" text-anchor="middle" fill="currentColor">answer</text>
+          <text class="n-sub" x="1015" y="94" text-anchor="middle" fill="var(--steel)">shelf life &middot; yield &middot; mass balance</text>
+          <text class="n-sub" x="1015" y="111" text-anchor="middle" fill="var(--steel)">what to load next &middot; batch genealogy</text>
+
+          <!-- lane B: language -->
+          <text class="n-lab" x="290" y="188" fill="var(--chill)">Language work &middot; a person checks and signs</text>
+          <path d="M246 222 C 276 222, 276 250, 300 250" fill="none" stroke="currentColor" stroke-width="1.6" marker-end="url(#ar2)"/>
+          <text class="n-edge" x="252" y="268" fill="var(--steel)">language</text>
+
+          <g fill="var(--sunk)" stroke="var(--hair)">
+            <rect x="308" y="200" width="300" height="42" rx="3"/>
+            <rect x="308" y="250" width="300" height="42" rx="3"/>
+            <rect x="308" y="300" width="300" height="42" rx="3"/>
+          </g>
+          <text class="n-title" x="458" y="220" text-anchor="middle" fill="currentColor">qa_regulatory</text>
+          <text class="n-sub" x="458" y="235" text-anchor="middle" fill="var(--steel)">RAG chain, answers carry citations</text>
+          <text class="n-title" x="458" y="270" text-anchor="middle" fill="currentColor">incident</text>
+          <text class="n-sub" x="458" y="285" text-anchor="middle" fill="var(--steel)">fields &rarr; severity &rarr; RIDDOR draft</text>
+          <text class="n-title" x="458" y="320" text-anchor="middle" fill="currentColor">audit_pack</text>
+          <text class="n-sub" x="458" y="335" text-anchor="middle" fill="var(--steel)">orchestrator-workers</text>
+
+          <path d="M608 221 C 636 221, 636 262, 660 262" fill="none" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar2)"/>
+          <line x1="608" y1="271" x2="660" y2="269" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar2)"/>
+          <path d="M608 321 C 636 321, 636 278, 660 278" fill="none" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar2)"/>
+
+          <rect x="668" y="234" width="140" height="72" rx="3" fill="var(--chill-bg)" stroke="var(--chill)" stroke-width="1.6"/>
+          <text class="n-title" x="738" y="260" text-anchor="middle" fill="var(--chill)">VERIFIER</text>
+          <text class="n-sub" x="738" y="276" text-anchor="middle" fill="var(--chill)">code, every output</text>
+          <text class="n-sub" x="738" y="292" text-anchor="middle" fill="var(--chill)">schemas &middot; citations</text>
+
+          <line x1="808" y1="270" x2="838" y2="270" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar2)"/>
+
+          <rect x="838" y="234" width="150" height="72" rx="3" fill="var(--surface)" stroke="var(--chill)" stroke-width="1.6"/>
+          <text class="n-title" x="913" y="260" text-anchor="middle" fill="var(--chill)">JUDGE</text>
+          <text class="n-sub" x="913" y="276" text-anchor="middle" fill="currentColor">second model, fresh context</text>
+          <text class="n-sub" x="913" y="292" text-anchor="middle" fill="var(--steel)">consequence-bearing only</text>
+
+          <line x1="988" y1="270" x2="1016" y2="270" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar2)"/>
+
+          <rect x="1016" y="234" width="150" height="72" rx="3" fill="var(--signal-bg)" stroke="var(--signal)" stroke-width="1.8"/>
+          <text class="n-title" x="1091" y="260" text-anchor="middle" fill="var(--signal)">SIGN-OFF</text>
+          <text class="n-sub" x="1091" y="276" text-anchor="middle" fill="var(--signal)">a named human</text>
+          <text class="n-sub" x="1091" y="292" text-anchor="middle" fill="var(--signal)">timestamped &middot; C-11</text>
+
+          <text class="n-sub" x="308" y="374" fill="var(--steel)">Every stage stores a reasoning trace with the record, for the approver and the auditor.</text>
+          <text class="n-sub" x="308" y="394" fill="var(--steel)">Captured text enters prompts as delimited, quoted data. Nothing a user types can address the model.</text>
+          <text class="n-sub" x="308" y="414" fill="var(--steel)">The pipeline never files anything.</text>
+        </svg>
+      </div>
+      <figcaption>The judge is a different lab and different training data, so it disagrees with the workhorse instead of nodding along. It is calibrated against human labels before it is allowed to gate anything.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <div class="eyebrow">Table 1</div>
+    <h2>Tech stack, all seven layers</h2>
+    <p class="lede">Every choice below is reversible at a different cost. The ones that are expensive to reverse are the ones that were decided first.</p>
+
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th>Layer</th><th>Stack</th><th>Why this stack</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="lyr"><span class="num">01</span><span class="nm">Adapters</span></td>
+            <td class="stack">Jinja2 + HTMX (vendored)<br>FastAPI, JSON /api/v1</td>
+            <td class="why">Forms filled by gloved hands on a wet tablet, with no build step. The JSON adapter keeps the React door open without opening it.</td>
+          </tr>
+          <tr>
+            <td class="lyr"><span class="num">02</span><span class="nm">Engine</span></td>
+            <td class="stack">In-process dispatch<br>route &middot; permit &middot; audit &middot; isolate</td>
+            <td class="why">One place every request crosses, so permission and audit cannot be forgotten in a module. Under 100 lines, because it holds no logic.</td>
+          </tr>
+          <tr>
+            <td class="lyr"><span class="num">03</span><span class="nm">Modules</span></td>
+            <td class="stack">auth &middot; identity &middot; audit<br>qcheck &middot; checklist &middot; assistant</td>
+            <td class="why">One capability, four files. Seams are import contracts in pyproject.toml checked by <code>make gate</code>, so the monolith splits later along lines that provably held.</td>
+          </tr>
+          <tr>
+            <td class="lyr"><span class="num">04</span><span class="nm">Assistant</span></td>
+            <td class="stack">Router &rarr; RAG / extraction /<br>orchestrator-workers &rarr; verifier<br>&rarr; judge &rarr; sign-off</td>
+            <td class="why">Operational questions leave before any model sees them. What remains is language work, checked by code, then by an adversarial second model, then by a person who signs.</td>
+          </tr>
+          <tr>
+            <td class="lyr"><span class="num">05</span><span class="nm">Inference</span></td>
+            <td class="stack">vLLM on a dedicated Linux GPU box<br>Qwen3.6-27B &middot; gpt-oss-20b</td>
+            <td class="why">Nothing leaves site. 119 languages carries a floor that speaks Polish, Romanian, Lithuanian and Latvian. OpenAI-compatible, so a model swap is config plus an eval rerun.</td>
+          </tr>
+          <tr>
+            <td class="lyr"><span class="num">06</span><span class="nm">Data</span></td>
+            <td class="stack">Postgres 16<br>Alembic, hand-written DDL</td>
+            <td class="why">C-03 and C-12 are grants and triggers, which SQLite cannot express. Where DDL carries policy it is written by hand, not generated.</td>
+          </tr>
+          <tr>
+            <td class="lyr"><span class="num">07</span><span class="nm">Gates</span></td>
+            <td class="stack">make gate in GitHub Actions<br>Phase 9 eval harness</td>
+            <td class="why">The same command locally and in CI. Every prompt change and every model change reruns the eval set before it merges, because a gate nobody has watched fail is decoration.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">Positioning</div>
+    <h2>Where this differs from an agent-per-function design</h2>
+    <div class="cards">
+      <div class="card">
+        <span class="tag t-seal">Routing</span>
+        <h3>Fewer agents, not more</h3>
+        <p>The common pattern puts a specialised agent in front of each function: validation, ordering, monitoring, reporting. Here the router's first job is to decide the request does not need a model at all, and most requests do not.</p>
+      </div>
+      <div class="card">
+        <span class="tag t-chill">Trust</span>
+        <h3>Nothing gets rebuilt to be re-agented</h3>
+        <p>A stock tracker and a yield report already exist and staff use them daily. A second screen that eventually disagrees with the first does not get adjudicated, it gets both screens distrusted. The rule is to find out whether a screen exists before building one.</p>
+      </div>
+      <div class="card">
+        <span class="tag t-sig">Accountability</span>
+        <h3>The pipeline never files anything</h3>
+        <p>Automated output stops at a draft. A named human signs, and the timestamp lands on the record with the model id, the prompt version, the token counts and the cost.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Drawn from <code>ARCHITECTURE.md</code> &sect;8 (the LLM pipeline) and &sect;9 (tech stack) in the Copernus repository, plus <code>docs/ai-approach.md</code> (COP-AI-01). Model selection is provisional by design: the Phase 9 eval harness gates it, and the eval set carries Polish, Romanian, Lithuanian and Latvian incident samples from day one. Hardware sizing assumes a single 48&nbsp;GB card until the inventory of the site&rsquo;s seven servers lands.
+  </footer>
+
+</div>
